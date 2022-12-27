@@ -6,7 +6,7 @@ using TShockAPI;
 namespace TerrariaServerPacketMonitor
 {
     [ApiVersion(2, 1)]
-    public class MianPlugin : TerrariaPlugin
+    public class MainPlugin : TerrariaPlugin
     {
         public override string Author => "Leader";
         public override string Description => "数据包监控";
@@ -14,7 +14,7 @@ namespace TerrariaServerPacketMonitor
         public override Version Version => new Version(1, 0, 0, 0);
         internal List<Packet> Receive { get; set; } = new List<Packet>();
         internal List<Packet> Send { get; set; } = new List<Packet>();
-        public MianPlugin(Main game) : base(game)
+        public MainPlugin(Main game) : base(game)
         {
         }
 
