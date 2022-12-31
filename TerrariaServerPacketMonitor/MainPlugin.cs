@@ -1,7 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿using LinqToDB;
+using LinqToDB.Data;
+using Newtonsoft.Json;
+using System.Reflection;
 using Terraria;
 using TerrariaApi.Server;
+using TerrariaServerPacketMonitor.Attr;
+using TerrariaServerPacketMonitor.Database.Model;
 using TShockAPI;
+using TShockAPI.Configuration;
 
 namespace TerrariaServerPacketMonitor
 {
@@ -12,8 +18,12 @@ namespace TerrariaServerPacketMonitor
         public override string Description => "数据包监控";
         public override string Name => "TerrariaServerPacketMonitor";
         public override Version Version => new Version(1, 0, 0, 0);
+        internal string ConfigFilePath => Path.Combine(TShock.SavePath, "TerrariaServerPacketMonitor.json");
+        private PluginSettings _settings = default!;
+        internal PluginSettings Settings => _settings ??= LoadSettings();
         internal List<Packet> Receive { get; set; } = new List<Packet>();
         internal List<Packet> Send { get; set; } = new List<Packet>();
+        internal static DataConnection DB { get; set; } = default!;
         public MainPlugin(Main game) : base(game)
         {
         }
@@ -23,11 +33,26 @@ namespace TerrariaServerPacketMonitor
             ServerApi.Hooks.NetSendBytes.Register(this, OnNetSendBytes);
             ServerApi.Hooks.NetGetData.Register(this, OnNetGetData);
             Commands.ChatCommands.Add(new Command("", analyze, "ana"));
+
+            // Database Initialization
+            if (Settings.DatabaseLoggingEnabled)
+            {
+                DB = new DataConnection(
+                    LinqToDB.DataProvider.SQLite.SQLiteTools.GetDataProvider(),
+                    new System.Data.SQLite.SQLiteConnectionStringBuilder()
+                    {
+                        DataSource = Path.Combine(TShock.SavePath, "packet_analyze.sqlite"),
+                        Pooling = true,
+                        FailIfMissing = false
+                    }.ConnectionString);
+
+                // Packet Table Initialization
+                PacketModelHelper.InitializePacketTables();
+            }
         }
 
         private void analyze(CommandArgs args)
         {
-            //c
             {
                 Receive.Sort((x, y) => y.Count.CompareTo(x.Count));
                 Send.Sort((x, y) => y.Count.CompareTo(x.Count));
@@ -44,7 +69,7 @@ namespace TerrariaServerPacketMonitor
                 }, Formatting.Indented);
                 File.WriteAllText("analyze_c.txt", text);
             }
-            {//
+            {
                 Receive.Sort((x, y) => y.TotalBytes.CompareTo(x.TotalBytes));
                 Send.Sort((x, y) => y.TotalBytes.CompareTo(x.TotalBytes));
                 var text = JsonConvert.SerializeObject(new Analyze()
@@ -65,8 +90,11 @@ namespace TerrariaServerPacketMonitor
 
         private void OnNetGetData(GetDataEventArgs args)
         {
+            if (Settings.DatabaseLoggingEnabled)
+                PacketModelHelper.InsertPacket(args.Msg.readBuffer.Skip(args.Index-3).Take(args.Length+2).ToArray(), true, args.Msg.whoAmI);
+
             var data = Receive.Find(x => x.Type == args.MsgID);
-            if ( data== null)
+            if (data == null)
             {
                 Receive.Add(new Packet() { Type = args.MsgID, Count = 1, TotalBytes = args.Msg.totalData, Name = args.MsgID.ToString() });
             }
@@ -79,6 +107,11 @@ namespace TerrariaServerPacketMonitor
 
         private void OnNetSendBytes(SendBytesEventArgs args)
         {
+            // Assume Offset is 0 for better performance (X)
+            // TODO: Switch to Span<byte> to avoid memory copy
+            if (Settings.DatabaseLoggingEnabled)
+                PacketModelHelper.InsertPacket(args.Buffer.Take(args.Count).ToArray(), false, args.Socket.Id);
+
             var type = (PacketTypes)args.Buffer[2];
             var data = Send.Find(x => x.Type == type);
             if (data == null)
@@ -90,6 +123,24 @@ namespace TerrariaServerPacketMonitor
                 data.Count++;
                 data.TotalBytes += args.Count;
             }
+        }
+
+        private PluginSettings LoadSettings()
+        {
+            if (File.Exists(ConfigFilePath))
+            {
+                try
+                {
+                    return JsonConvert.DeserializeObject<PluginSettings>(File.ReadAllText(ConfigFilePath)) ?? new PluginSettings();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"[TerrariaServerPacketMonitor] Error occur while loading config file, Error: {e}");
+                }
+            }
+            else
+                File.WriteAllText(ConfigFilePath, JsonConvert.SerializeObject(new PluginSettings(), Formatting.Indented));
+            return new PluginSettings();
         }
     }
 }
