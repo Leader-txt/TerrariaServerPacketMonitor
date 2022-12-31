@@ -7,6 +7,7 @@ using TerrariaApi.Server;
 using TerrariaServerPacketMonitor.Attr;
 using TerrariaServerPacketMonitor.Database.Model;
 using TShockAPI;
+using TShockAPI.Configuration;
 
 namespace TerrariaServerPacketMonitor
 {
@@ -17,35 +18,37 @@ namespace TerrariaServerPacketMonitor
         public override string Description => "数据包监控";
         public override string Name => "TerrariaServerPacketMonitor";
         public override Version Version => new Version(1, 0, 0, 0);
+        internal string ConfigFilePath => Path.Combine(TShock.SavePath, "TerrariaServerPacketMonitor.json");
+        private PluginSettings _settings = default!;
+        internal PluginSettings Settings => _settings ??= LoadSettings();
         internal List<Packet> Receive { get; set; } = new List<Packet>();
         internal List<Packet> Send { get; set; } = new List<Packet>();
-        internal static DataConnection DB { get; set; }
+        internal static DataConnection DB { get; set; } = default!;
         public MainPlugin(Main game) : base(game)
         {
         }
 
         public override void Initialize()
         {
-            ServerApi.Hooks.GameInitialize.Register(this, OnGameInitialize);
             ServerApi.Hooks.NetSendBytes.Register(this, OnNetSendBytes);
             ServerApi.Hooks.NetGetData.Register(this, OnNetGetData);
             Commands.ChatCommands.Add(new Command("", analyze, "ana"));
-        }
 
-        private void OnGameInitialize(EventArgs args)
-        {
-            // Database Initialize
-            DB = new DataConnection(
-                LinqToDB.DataProvider.SQLite.SQLiteTools.GetDataProvider(),
-                new System.Data.SQLite.SQLiteConnectionStringBuilder()
-                {
-                    DataSource = Path.Combine(TShock.SavePath, "packet_analyze.sqlite"),
-                    Pooling = true,
-                    FailIfMissing = false
-                }.ConnectionString);
+            // Database Initialization
+            if (Settings.DatabaseLoggingEnabled)
+            {
+                DB = new DataConnection(
+                    LinqToDB.DataProvider.SQLite.SQLiteTools.GetDataProvider(),
+                    new System.Data.SQLite.SQLiteConnectionStringBuilder()
+                    {
+                        DataSource = Path.Combine(TShock.SavePath, "packet_analyze.sqlite"),
+                        Pooling = true,
+                        FailIfMissing = false
+                    }.ConnectionString);
 
-            // Packet Table Initialize
-            PacketModelHelper.InitializePacketTables();
+                // Packet Table Initialization
+                PacketModelHelper.InitializePacketTables();
+            }
         }
 
         private void analyze(CommandArgs args)
@@ -87,9 +90,9 @@ namespace TerrariaServerPacketMonitor
 
         private void OnNetGetData(GetDataEventArgs args)
         {
-            PacketModelHelper.InsertPacket(args.Msg.readBuffer.Skip(args.Index-3).Take(args.Length+2).ToArray(), true, args.Msg.whoAmI);
+            if (Settings.DatabaseLoggingEnabled)
+                PacketModelHelper.InsertPacket(args.Msg.readBuffer.Skip(args.Index-3).Take(args.Length+2).ToArray(), true, args.Msg.whoAmI);
 
-            #region Old Stuffs
             var data = Receive.Find(x => x.Type == args.MsgID);
             if (data == null)
             {
@@ -100,16 +103,15 @@ namespace TerrariaServerPacketMonitor
                 data.Count++;
                 data.TotalBytes += args.Msg.totalData;
             }
-            #endregion
         }
 
         private void OnNetSendBytes(SendBytesEventArgs args)
         {
             // Assume Offset is 0 for better performance (X)
             // TODO: Switch to Span<byte> to avoid memory copy
-            PacketModelHelper.InsertPacket(args.Buffer.Take(args.Count).ToArray(), false, args.Socket.Id);
+            if (Settings.DatabaseLoggingEnabled)
+                PacketModelHelper.InsertPacket(args.Buffer.Take(args.Count).ToArray(), false, args.Socket.Id);
 
-            #region Old Stuffs
             var type = (PacketTypes)args.Buffer[2];
             var data = Send.Find(x => x.Type == type);
             if (data == null)
@@ -121,7 +123,24 @@ namespace TerrariaServerPacketMonitor
                 data.Count++;
                 data.TotalBytes += args.Count;
             }
-            #endregion
+        }
+
+        private PluginSettings LoadSettings()
+        {
+            if (File.Exists(ConfigFilePath))
+            {
+                try
+                {
+                    return JsonConvert.DeserializeObject<PluginSettings>(File.ReadAllText(ConfigFilePath)) ?? new PluginSettings();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"[TerrariaServerPacketMonitor] Error occur while loading config file, Error: {e}");
+                }
+            }
+            else
+                File.WriteAllText(ConfigFilePath, JsonConvert.SerializeObject(new PluginSettings(), Formatting.Indented));
+            return new PluginSettings();
         }
     }
 }
