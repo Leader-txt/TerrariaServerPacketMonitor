@@ -1,5 +1,6 @@
 ﻿using LinqToDB.Data;
 using Newtonsoft.Json;
+using OTAPI;
 using Terraria;
 using TerrariaApi.Server;
 using TerrariaServerPacketMonitor.Database.Model;
@@ -27,8 +28,8 @@ namespace TerrariaServerPacketMonitor
 
         public override void Initialize()
         {
-            ServerApi.Hooks.NetSendBytes.Register(this, OnNetSendBytes);
-            ServerApi.Hooks.NetGetData.Register(this, OnNetGetData);
+            Hooks.NetMessage.SendBytes += OnNetSendBytes;
+            Hooks.MessageBuffer.GetData += OnNetGetData;
             Commands.ChatCommands.Add(new Command("", analyze, "ana"));
 
             // Database Initialization
@@ -54,7 +55,7 @@ namespace TerrariaServerPacketMonitor
             {
                 Receive.Sort((x, y) => y.Count.CompareTo(x.Count));
                 Send.Sort((x, y) => y.Count.CompareTo(x.Count));
-                var text = JsonConvert.SerializeObject(new Analyze()
+                var text = JsonConvert.SerializeObject(new Analyze
                 {
                     TotalPackets = Receive.Select(x => x.Count).Sum() + Send.Select(x => x.Count).Sum(),
                     TotalBytes = Receive.Select(x => x.TotalBytes).Sum() + Send.Select(x => x.TotalBytes).Sum(),
@@ -70,7 +71,7 @@ namespace TerrariaServerPacketMonitor
             {
                 Receive.Sort((x, y) => y.TotalBytes.CompareTo(x.TotalBytes));
                 Send.Sort((x, y) => y.TotalBytes.CompareTo(x.TotalBytes));
-                var text = JsonConvert.SerializeObject(new Analyze()
+                var text = JsonConvert.SerializeObject(new Analyze
                 {
                     TotalPackets = Receive.Select(x => x.Count).Sum() + Send.Select(x => x.Count).Sum(),
                     TotalBytes = Receive.Select(x => x.TotalBytes).Sum() + Send.Select(x => x.TotalBytes).Sum(),
@@ -86,40 +87,53 @@ namespace TerrariaServerPacketMonitor
             args.Player.SendSuccessMessage("数据包收发分析表已生成");
         }
 
-        private void OnNetGetData(GetDataEventArgs args)
-        {
-            if (Settings.DatabaseLoggingEnabled)
-                PacketModelHelper.InsertPacket(args.Msg.readBuffer.Skip(args.Index-3).Take(args.Length+2).ToArray(), true, args.Msg.whoAmI);
-
-            var data = Receive.Find(x => x.Type == args.MsgID);
-            if (data == null)
-            {
-                Receive.Add(new Packet { Type = args.MsgID, Count = 1, TotalBytes = args.Msg.totalData, Name = args.MsgID.ToString() });
-            }
-            else
-            {
-                data.Count++;
-                data.TotalBytes += args.Msg.totalData;
-            }
-        }
-
-        private void OnNetSendBytes(SendBytesEventArgs args)
+        private void OnNetSendBytes(object? _, Hooks.NetMessage.SendBytesEventArgs args)
         {
             // Assume Offset is 0 for better performance (X)
-            // TODO: Switch to Span<byte> to avoid memory copy
+            // TODO: Avoid memory copy
             if (Settings.DatabaseLoggingEnabled)
-                PacketModelHelper.InsertPacket(args.Buffer.Take(args.Count).ToArray(), false, args.Socket.Id);
-
-            var type = (PacketTypes)args.Buffer[2];
+                PacketModelHelper.InsertPacket(args.Data.Take(args.Size).ToArray(), false, args.RemoteClient);
+            
+            var type = (PacketTypes)args.Data[2];
             var data = Send.Find(x => x.Type == type);
             if (data == null)
             {
-                Send.Add(new Packet { Type = type, Count = 1, TotalBytes = args.Count, Name = type.ToString() }); 
+                Send.Add(new Packet
+                {
+                    Type = type,
+                    Count = 1,
+                    TotalBytes = args.Size,
+                    Name = type.ToString()
+                });
             }
             else
             {
                 data.Count++;
-                data.TotalBytes += args.Count;
+                data.TotalBytes += args.Size;
+            }
+        }
+
+        private void OnNetGetData(object? _, Hooks.MessageBuffer.GetDataEventArgs args)
+        {
+            if (Settings.DatabaseLoggingEnabled)
+                PacketModelHelper.InsertPacket(args.Instance.readBuffer.Skip(args.ReadOffset - 3).Take(args.Length + 2).ToArray(), true, args.Instance.whoAmI);
+
+            var type = (PacketTypes)args.PacketId;
+            var data = Receive.Find(x => x.Type == type);
+            if (data == null)
+            {
+                Receive.Add(new Packet
+                {
+                    Type = type,
+                    Count = 1,
+                    TotalBytes = args.Length + 2,
+                    Name = type.ToString()
+                });
+            }
+            else
+            {
+                data.Count++;
+                data.TotalBytes += args.Length + 2;
             }
         }
 
