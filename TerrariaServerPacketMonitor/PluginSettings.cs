@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// ReSharper disable FieldCanBeMadeReadOnly.Global
+// ReSharper disable ConvertToConstant.Global
 
 namespace TerrariaServerPacketMonitor
 {

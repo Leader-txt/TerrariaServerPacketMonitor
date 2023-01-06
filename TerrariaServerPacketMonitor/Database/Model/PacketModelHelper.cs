@@ -7,7 +7,7 @@ namespace TerrariaServerPacketMonitor.Database.Model
 {
     internal static class PacketModelHelper
     {
-        public static Lazy<Dictionary<int, Type>> MsgIDToModelMap = new(() =>
+        private static readonly Lazy<Dictionary<int, Type>> MsgIDToModelMap = new(() =>
         {
             return Assembly.GetExecutingAssembly().GetTypes()
                 .Where(x => x.GetCustomAttribute<PacketModelAttribute>() != null)
@@ -26,7 +26,7 @@ namespace TerrariaServerPacketMonitor.Database.Model
                 // db.CreateTable<modelType>(tableOptions: TableOptions.CreateIfNotExists);
                 typeof(DataExtensions).GetMethod("CreateTable")!
                     .MakeGenericMethod(p.Value)
-                    .Invoke(null, new object[]
+                    .Invoke(null, new[]
                     {
                         db,                            // dataContext
                         Type.Missing,                  // tableName
@@ -44,7 +44,7 @@ namespace TerrariaServerPacketMonitor.Database.Model
         public static void InsertPacket(byte[] data, bool isFromClient, int clientIndex = -1)
         {
             var db = MainPlugin.DB;
-            PacketTypes msgID = (PacketTypes)data[2];
+            var msgID = (PacketTypes)data[2];
             // Why did I write this sh*t? ofc for speed :P
             // Or is it necessary? ;-; I mean I have already used linq2db
             // TODO: Switch to Reflection in PacketModelAdapter.ParsePacket function
@@ -626,16 +626,14 @@ namespace TerrariaServerPacketMonitor.Database.Model
                     db.Insert(PacketSyncItemCannotBeTakenByEnemies.Parse(data).FillPacketInfo(data, isFromClient, clientIndex));
                     break;
 
-                default:
-                    // TODO: PacketIDNotFoundException
-                    break;
+                // TODO: PacketIDNotFoundException
             }
         }
 
-        public static T FillPacketInfo<T>(this T packet, byte[] data, bool isFromClient, int ClientIndex = -1) where T : PacketModelBase
+        private static T FillPacketInfo<T>(this T packet, byte[] data, bool isFromClient, int clientIndex = -1) where T : PacketModelBase
         {
             packet.IsFromClient = isFromClient;
-            packet.ClientIndex = ClientIndex;
+            packet.ClientIndex = clientIndex;
             packet.Data = data;
             packet.Size = data.Length;
             packet.TimeStamp = DateTime.Now;

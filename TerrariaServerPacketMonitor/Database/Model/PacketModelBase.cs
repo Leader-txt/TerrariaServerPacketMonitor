@@ -1,6 +1,9 @@
 ﻿using LinqToDB;
 using LinqToDB.Mapping;
 
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
+
 namespace TerrariaServerPacketMonitor.Database.Model
 {
     [Table]
@@ -13,6 +16,7 @@ namespace TerrariaServerPacketMonitor.Database.Model
         public int ID { get; set; }
 
         [Column]
+        
         public bool IsFromClient { get; set; }
 
         [Column]
@@ -20,7 +24,7 @@ namespace TerrariaServerPacketMonitor.Database.Model
 
         [Nullable]
         [Column(DataType = DataType.Blob, Order = -3)]
-        public byte[] Data { get; set; } = default!;
+        public byte[] Data { get; set; } = null!;
 
         [Column(Order = -2)]
         public int Size { get; set; }
