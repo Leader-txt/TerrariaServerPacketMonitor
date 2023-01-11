@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "DAYvK+22O7eSer8utk+FsQwDkzz3Ey0Mb26wRcIzTF83eO8ywWUPecohRiKsLmGjwkKJj8C+9b1wiGXxGNpqdw==",
+  "dgSpecHash": "9AWbHb3P2Vj8Q2xCrBCpy7uydd7sl+6789EB8aE70Z0uhPHcN9kdrRQ2OhzK3ETbvFQtMD5v2VCdCm0OfRyBZA==",
   "success": true,
   "projectFilePath": "D:\\Documents\\Code\\TerrariaServerPacketMonitor\\TerrariaServerPacketMonitor\\TerrariaServerPacketMonitor.csproj",
   "expectedPackageFiles": [
@@ -10,6 +10,7 @@
     "C:\\Users\\32512\\.nuget\\packages\\k4os.compression.lz4\\1.2.6\\k4os.compression.lz4.1.2.6.nupkg.sha512",
     "C:\\Users\\32512\\.nuget\\packages\\k4os.compression.lz4.streams\\1.2.6\\k4os.compression.lz4.streams.1.2.6.nupkg.sha512",
     "C:\\Users\\32512\\.nuget\\packages\\k4os.hash.xxhash\\1.0.6\\k4os.hash.xxhash.1.0.6.nupkg.sha512",
+    "C:\\Users\\32512\\.nuget\\packages\\linq2db\\4.4.0\\linq2db.4.4.0.nupkg.sha512",
     "C:\\Users\\32512\\.nuget\\packages\\microsoft.data.sqlite\\6.0.11\\microsoft.data.sqlite.6.0.11.nupkg.sha512",
     "C:\\Users\\32512\\.nuget\\packages\\microsoft.data.sqlite.core\\6.0.11\\microsoft.data.sqlite.core.6.0.11.nupkg.sha512",
     "C:\\Users\\32512\\.nuget\\packages\\microsoft.netcore.platforms\\2.0.0\\microsoft.netcore.platforms.2.0.0.nupkg.sha512",
@@ -36,6 +37,7 @@
     "C:\\Users\\32512\\.nuget\\packages\\sqlitepclraw.lib.e_sqlite3\\2.0.6\\sqlitepclraw.lib.e_sqlite3.2.0.6.nupkg.sha512",
     "C:\\Users\\32512\\.nuget\\packages\\sqlitepclraw.provider.e_sqlite3\\2.0.6\\sqlitepclraw.provider.e_sqlite3.2.0.6.nupkg.sha512",
     "C:\\Users\\32512\\.nuget\\packages\\steamworks.net\\20.1.0\\steamworks.net.20.1.0.nupkg.sha512",
+    "C:\\Users\\32512\\.nuget\\packages\\stub.system.data.sqlite.core.netstandard\\1.0.117\\stub.system.data.sqlite.core.netstandard.1.0.117.nupkg.sha512",
     "C:\\Users\\32512\\.nuget\\packages\\system.buffers\\4.5.1\\system.buffers.4.5.1.nupkg.sha512",
     "C:\\Users\\32512\\.nuget\\packages\\system.collections\\4.3.0\\system.collections.4.3.0.nupkg.sha512",
     "C:\\Users\\32512\\.nuget\\packages\\system.collections.nongeneric\\4.3.0\\system.collections.nongeneric.4.3.0.nupkg.sha512",
@@ -44,6 +46,7 @@
     "C:\\Users\\32512\\.nuget\\packages\\system.componentmodel.primitives\\4.3.0\\system.componentmodel.primitives.4.3.0.nupkg.sha512",
     "C:\\Users\\32512\\.nuget\\packages\\system.componentmodel.typeconverter\\4.3.0\\system.componentmodel.typeconverter.4.3.0.nupkg.sha512",
     "C:\\Users\\32512\\.nuget\\packages\\system.configuration.configurationmanager\\6.0.0\\system.configuration.configurationmanager.6.0.0.nupkg.sha512",
+    "C:\\Users\\32512\\.nuget\\packages\\system.data.sqlite.core\\1.0.117\\system.data.sqlite.core.1.0.117.nupkg.sha512",
     "C:\\Users\\32512\\.nuget\\packages\\system.diagnostics.debug\\4.3.0\\system.diagnostics.debug.4.3.0.nupkg.sha512",
     "C:\\Users\\32512\\.nuget\\packages\\system.diagnostics.performancecounter\\6.0.1\\system.diagnostics.performancecounter.6.0.1.nupkg.sha512",
     "C:\\Users\\32512\\.nuget\\packages\\system.drawing.common\\6.0.0\\system.drawing.common.6.0.0.nupkg.sha512",

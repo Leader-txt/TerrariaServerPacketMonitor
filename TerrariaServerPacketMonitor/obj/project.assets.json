@@ -90,6 +90,19 @@
           }
         }
       },
+      "linq2db/4.4.0": {
+        "type": "package",
+        "compile": {
+          "lib/net6.0/linq2db.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/linq2db.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Microsoft.Data.Sqlite/6.0.11": {
         "type": "package",
         "dependencies": {
@@ -606,6 +619,37 @@
           }
         }
       },
+      "Stub.System.Data.SQLite.Core.NetStandard/1.0.117": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.1/System.Data.SQLite.dll": {
+            "related": ".dll.altconfig;.xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.1/System.Data.SQLite.dll": {
+            "related": ".dll.altconfig;.xml"
+          }
+        },
+        "runtimeTargets": {
+          "runtimes/linux-x64/native/SQLite.Interop.dll": {
+            "assetType": "native",
+            "rid": "linux-x64"
+          },
+          "runtimes/osx-x64/native/SQLite.Interop.dll": {
+            "assetType": "native",
+            "rid": "osx-x64"
+          },
+          "runtimes/win-x64/native/SQLite.Interop.dll": {
+            "assetType": "native",
+            "rid": "win-x64"
+          },
+          "runtimes/win-x86/native/SQLite.Interop.dll": {
+            "assetType": "native",
+            "rid": "win-x86"
+          }
+        }
+      },
       "System.Buffers/4.5.1": {
         "type": "package",
         "compile": {
@@ -743,6 +787,12 @@
         },
         "build": {
           "buildTransitive/netcoreapp3.1/_._": {}
+        }
+      },
+      "System.Data.SQLite.Core/1.0.117": {
+        "type": "package",
+        "dependencies": {
+          "Stub.System.Data.SQLite.Core.NetStandard": "[1.0.117]"
         }
       },
       "System.Diagnostics.Debug/4.3.0": {
@@ -1453,6 +1503,34 @@
         "lib/netstandard2.0/K4os.Hash.xxHash.xml"
       ]
     },
+    "linq2db/4.4.0": {
+      "sha512": "6/u1EzQlV25bhN0Ej/I5dLV5Hgxun+ww/TX2VnMBnSVytED2VzQGeFIO/14I624GkfPOtB79x1ooL3F18dAbdw==",
+      "type": "package",
+      "path": "linq2db/4.4.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "MIT-LICENSE.txt",
+        "README.md",
+        "images/icon.png",
+        "lib/net45/linq2db.dll",
+        "lib/net45/linq2db.xml",
+        "lib/net46/linq2db.dll",
+        "lib/net46/linq2db.xml",
+        "lib/net472/linq2db.dll",
+        "lib/net472/linq2db.xml",
+        "lib/net6.0/linq2db.dll",
+        "lib/net6.0/linq2db.xml",
+        "lib/netcoreapp3.1/linq2db.dll",
+        "lib/netcoreapp3.1/linq2db.xml",
+        "lib/netstandard2.0/linq2db.dll",
+        "lib/netstandard2.0/linq2db.xml",
+        "lib/netstandard2.1/linq2db.dll",
+        "lib/netstandard2.1/linq2db.xml",
+        "linq2db.4.4.0.nupkg.sha512",
+        "linq2db.nuspec"
+      ]
+    },
     "Microsoft.Data.Sqlite/6.0.11": {
       "sha512": "oa/UXdIRx95o46eF/RTnCw4QDZfJikH0v5vSrFiLoAWFOfLOv5/jzFmD0+EQ33e+87sUNi2mo0rfHS/1Q4WTCw==",
       "type": "package",
@@ -1948,6 +2026,27 @@
         "steamworks.net.nuspec"
       ]
     },
+    "Stub.System.Data.SQLite.Core.NetStandard/1.0.117": {
+      "sha512": "x1zzPC/A4MmiKGDLoxLE6O5KLu7Kz7dyzhPQzlqYFTFcXmXAtM7hNNWpGw5yLEz833AnGbd/kxoitXArgR4YyA==",
+      "type": "package",
+      "path": "stub.system.data.sqlite.core.netstandard/1.0.117",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/netstandard2.0/System.Data.SQLite.dll",
+        "lib/netstandard2.0/System.Data.SQLite.dll.altconfig",
+        "lib/netstandard2.0/System.Data.SQLite.xml",
+        "lib/netstandard2.1/System.Data.SQLite.dll",
+        "lib/netstandard2.1/System.Data.SQLite.dll.altconfig",
+        "lib/netstandard2.1/System.Data.SQLite.xml",
+        "runtimes/linux-x64/native/SQLite.Interop.dll",
+        "runtimes/osx-x64/native/SQLite.Interop.dll",
+        "runtimes/win-x64/native/SQLite.Interop.dll",
+        "runtimes/win-x86/native/SQLite.Interop.dll",
+        "stub.system.data.sqlite.core.netstandard.1.0.117.nupkg.sha512",
+        "stub.system.data.sqlite.core.netstandard.nuspec"
+      ]
+    },
     "System.Buffers/4.5.1": {
       "sha512": "Rw7ijyl1qqRS0YQD/WycNst8hUUMgrMH4FCn1nNm27M4VxchZ1js3fVjQaANHO5f3sN4isvP4a+Met9Y4YomAg==",
       "type": "package",
@@ -2299,6 +2398,17 @@
         "system.configuration.configurationmanager.6.0.0.nupkg.sha512",
         "system.configuration.configurationmanager.nuspec",
         "useSharedDesignerContext.txt"
+      ]
+    },
+    "System.Data.SQLite.Core/1.0.117": {
+      "sha512": "lGfOhA3QQod9XhdWYqLgNgbgq5uZnVG6DtnhDAdPisbLpTTgZBNbeGnp+GWt8C+3EyaqBYTGJWXcxHlHKwo05A==",
+      "type": "package",
+      "path": "system.data.sqlite.core/1.0.117",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "system.data.sqlite.core.1.0.117.nupkg.sha512",
+        "system.data.sqlite.core.nuspec"
       ]
     },
     "System.Diagnostics.Debug/4.3.0": {
@@ -4125,7 +4235,9 @@
     "net6.0": [
       "Newtonsoft.Json >= 13.0.1",
       "OTAPI.Upcoming >= 3.1.20",
-      "TShock >= 5.1.3"
+      "System.Data.SQLite.Core >= 1.0.117",
+      "TShock >= 5.1.3",
+      "linq2db >= 4.4.0"
     ]
   },
   "packageFolders": {
@@ -4184,9 +4296,17 @@
             "target": "Package",
             "version": "[3.1.20, )"
           },
+          "System.Data.SQLite.Core": {
+            "target": "Package",
+            "version": "[1.0.117, )"
+          },
           "TShock": {
             "target": "Package",
             "version": "[5.1.3, )"
+          },
+          "linq2db": {
+            "target": "Package",
+            "version": "[4.4.0, )"
           }
         },
         "imports": [
