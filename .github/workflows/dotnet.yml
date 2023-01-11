@@ -30,4 +30,4 @@ jobs:
       uses: actions/upload-artifact@v3.1.2
       with: 
         name: release
-        path: TerrariaServerPacketMonitor\TerrariaServerPacketMonitor\bin\Debug\net6.0
+        path: TerrariaServerPacketMonitor\bin\Debug\net6.0
